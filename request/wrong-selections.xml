@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+	Request: bogus 3GB memory DIMMs
+	Response: message 
+ -->
+<knowledgebase-request>
+
+	<queries>
+		<query-type>
+			<queryName>messages</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+	</queries>
+
+	<inOutFacts>
+		<named-fact>
+			<id>selection</id>
+			<fact class="com.lunatech.configuration.Selection">
+				<motherboardType>round</motherboardType>
+				<processorType>shiny</processorType>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory1</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>3</dimmSize>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory2</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>3</dimmSize>
+			</fact>
+		</named-fact>
+	</inOutFacts>
+	
+</knowledgebase-request>

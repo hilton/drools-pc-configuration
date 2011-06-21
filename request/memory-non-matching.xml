@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+	Request: integrated motherboard (which includes a processor)
+	Response: messages "Memory must be selected in matching pairs",
+		"1 x 1GB DIMMs selected", "3 x 2GB DIMMs selected"
+ -->
+<knowledgebase-request>
+
+	<queries>
+		<query-type>
+			<queryName>memory</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+		<query-type>
+			<queryName>messages</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+	</queries>
+
+	<inOutFacts>
+		<named-fact>
+			<id>selection</id>
+			<fact class="com.lunatech.configuration.Selection">
+				<motherboardType>fullSize</motherboardType>
+				<processorType>advanced</processorType>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory1</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>2</dimmSize>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory2</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>2</dimmSize>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory2</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>2</dimmSize>
+			</fact>
+		</named-fact>
+		<named-fact>
+			<id>memory3</id>
+			<fact class="com.lunatech.configuration.MemorySelection">
+				<dimmSize>1</dimmSize>
+			</fact>
+		</named-fact>
+	</inOutFacts>
+	
+</knowledgebase-request>

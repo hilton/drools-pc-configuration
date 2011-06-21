@@ -1,0 +1,59 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+<project name="pc-configuration" default="install">
+
+	<property file="/etc/ant/build.properties" />
+	<property name="build.dir" value="build" />
+
+	<!-- Pre-requisite: an installed Servlet container, e.g. Tomcat -->
+	<property name="deploy.dir" value="/Applications/apache-tomcat-5.5.28/webapps" />
+
+	<!-- Pre-requisite: Drools download -->
+	<property name="drools-server.war" value="lib-compile/drools-5.1.0.M1/drools-server-5.1.0.M1.war" />
+
+	<target name="install" description="Install the Drools Execution Server and the rules">
+		
+		<!-- 1. Expand (i.e. unzip) the Drools Execution Server WAR and deploy it to the Servlet container -->
+		<unwar src="${drools-server.war}" dest="${deploy.dir}/drools-server.war"/>
+
+		<!-- 2. In pc.properties, set 'dir' to the absolute path of the directory containing pc.drl -->
+		<!-- 3. Copy pc.properties to the deployed WAR's WEB-INF/classes -->
+		<copy todir="${deploy.dir}/drools-server.war/WEB-INF/classes" overwrite="true">
+			<fileset file="pc.properties"/>
+			<filterset>
+				<filter token="basedir" value="${basedir}"/>
+			</filterset>
+		</copy>
+
+		<copy todir="${deploy.dir}/drools-server.war/WEB-INF/lib">
+			<fileset dir="lib-runtime" includes="**/*.jar"/>
+		</copy>
+
+		<!-- Reload the web application, in case this is a re-deploy -->
+		<touch file="${deploy.dir}/drools-server.war/WEB-INF/web.xml"/>
+	</target>
+
+	<target name="run" description="Send an XML request to the Execution Service">
+		<exec executable="curl">
+			<arg line="--data @test-request/request.xml http://localhost:8080/drools-server/knowledgebase/pc"/>
+		</exec>
+	</target>
+	
+	<target name="run-empty" description="Send an XML request to the Execution Service">
+		<exec executable="curl">
+			<arg line="--data @request/empty.xml http://localhost:8080/drools-server/knowledgebase/pc"/>
+		</exec>
+	</target>
+	
+	<target name="run-all-options" description="Send an XML request to the Execution Service">
+		<exec executable="curl">
+			<arg line="--data @request/all-options.xml http://localhost:8080/drools-server/knowledgebase/pc"/>
+		</exec>
+	</target>
+	
+	<target name="run-json" description="Send a JSON request to the Execution Service">
+		<exec executable="curl">
+			<arg line='--header "Content-Type: application/json" --data @request/empty.json http://localhost:8080/drools-server/knowledgebase/pc'/>
+		</exec>
+	</target>
+	
+</project>

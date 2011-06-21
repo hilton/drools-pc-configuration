@@ -1,0 +1,9 @@
+{
+	"knowledgebase-request":{
+		"queries":{
+			"query-type":[{
+				"queryName":"messages", "factNames":{"string":["value"]}
+			}]
+		}
+	}
+}

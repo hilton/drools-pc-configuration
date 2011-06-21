@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knowledgebase-request>
+  <queries>
+    <query-type>
+      <queryName>Get enclosures</queryName>
+      <factNames>
+        <string>enclosure</string>
+      </factNames>
+      <args/>
+    </query-type>
+    <query-type>
+      <queryName>Get cars</queryName>
+      <factNames>
+        <string>car</string>
+      </factNames>
+      <args/>
+    </query-type>
+  </queries>
+  
+  <globals>
+  </globals>
+  
+  <inOutFacts>
+  </inOutFacts>
+  
+  <inFacts>
+  </inFacts>
+</knowledgebase-request>

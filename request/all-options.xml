@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+	Request: empty selection
+	Response: all options
+ -->
+<knowledgebase-request>
+
+	<queries>
+		<query-type>
+			<queryName>memory</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+		<query-type>
+			<queryName>motherboards</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+		<query-type>
+			<queryName>processors</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+		<query-type>
+			<queryName>messages</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+	</queries>
+
+	<inFacts>
+		<anon-fact>
+			<fact class="com.lunatech.configuration.Selection"/>
+		</anon-fact>
+	</inFacts>
+	
+	
+</knowledgebase-request>

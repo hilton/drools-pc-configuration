@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+	Request: empty
+	Response: messages only
+ -->
+<knowledgebase-request>
+
+	<queries>
+		<query-type>
+			<queryName>messages</queryName>
+			<factNames><string>value</string></factNames>
+		</query-type>
+	</queries>
+	
+</knowledgebase-request>

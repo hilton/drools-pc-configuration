@@ -1,0 +1,307 @@
+# PC configuration example - JBoss Rules rule file
+# Copyright ©2009 Lunatech Research
+package com.lunatech.configuration
+
+import java.util.ArrayList
+
+import org.drools.spi.KnowledgeHelper
+
+
+# Functions - used in rule right-hand side code.
+# In a production application, it is more convenient to move these to static
+# methods in a Java class and import that, for better tool support.  
+
+function void log(KnowledgeHelper drools, String message) {
+	# In production, this would be a log-framework call.
+	# In Log4J it is useful to use the package and rule name as the category.
+	String category = drools.getRule().getPackageName() + "." + drools.getRule().getName(); 
+	System.out.println(category + ": " + message);
+}
+
+function void insertMessage(KnowledgeHelper drools, String text) {
+	insertMessageWithType(drools, "result", text);
+}
+
+function void insertRuleMessage(KnowledgeHelper drools) {
+	insertMessageWithType(drools, "result", drools.getRule().getName());
+}
+
+function void insertLogMessage(KnowledgeHelper drools, String text) {
+	insertMessageWithType(drools, "log", text);
+}
+
+function void insertMessageWithType(KnowledgeHelper drools, String messageType, String text) {
+	Message message = new Message();
+	message.setType(messageType);
+	message.setText(text);
+	drools.insert(message);
+}
+
+
+# Type declarations - defines Javabeans for use as working memory facts.
+# In a production application, it is more convenient for these to be
+# Java POJOs, so you can add convenience constuctors and additional
+# behaviour. This example adds them in-line here, to avoid the need to
+# add a JAR containing these types to the drools-server.war 
+
+# PC component
+declare MemoryDimm
+	sizeInGigabytes : int
+end
+
+# PC component
+declare Motherboard
+	type : String
+	socketType : String
+	memorySockets : int
+end
+
+# PC component
+declare Processor
+	type : String
+	socketType : String	
+end
+
+# User selection - input data
+declare Selection
+	motherboardType : String
+	processorType : String
+end
+
+# User selection - input data
+declare MemorySelection
+	dimmSize : int
+end
+
+# Text messages
+declare Message
+	type : String
+	text : String
+end
+
+
+# Queries - used to select working memory facts for output
+
+query "memory"
+	value : MemoryDimm()
+end
+
+query "motherboards"
+	value : Motherboard()
+end
+
+query "processors"
+	value : Processor()
+end
+
+# Only include non-log messages in the output
+query "messages"
+	value : Message(type != "log")
+end
+
+
+# Technical rules
+
+# Log log messages
+rule "Log"
+	when
+		Message(type == "log", $text : text)
+	then
+		log(drools, $text);
+end
+
+rule "Selection"
+	when
+		$selection : Selection()
+	then
+		log(drools, $selection.toString());
+end
+
+
+# Data insertion rules - used to generate reference data.
+# In a production application it would be more convenient to load these from an
+# external resource, such as a database, and insert them when executing the 
+# session.
+
+rule "Insert memory"
+	when
+		not Message(text == "Memory inserted")
+	then 
+		MemoryDimm one = new MemoryDimm();
+		one.setSizeInGigabytes(1);
+		insert(one);
+		
+		MemoryDimm two = new MemoryDimm();
+		two.setSizeInGigabytes(2);
+		insert(two);
+		
+		MemoryDimm four = new MemoryDimm();
+		four.setSizeInGigabytes(4);
+		insert(four);
+		
+		insertLogMessage(drools, "Memory inserted");
+end
+
+rule "Insert motherboards"
+	when
+		not Message(text == "Motherboards inserted")
+	then 
+		Motherboard integrated = new Motherboard();
+		integrated.setType("integrated");
+		integrated.setSocketType("none");
+		integrated.setMemorySockets(0);
+		insert(integrated);
+		
+		Motherboard standard = new Motherboard();
+		standard.setType("standard");
+		standard.setSocketType("pga");
+		standard.setMemorySockets(2);
+		insert(standard);
+		
+		Motherboard fullSize = new Motherboard();
+		fullSize.setType("fullSize");
+		fullSize.setSocketType("lga");
+		fullSize.setMemorySockets(4);
+		insert(fullSize);
+		
+		insertLogMessage(drools, "Motherboards inserted");
+end
+
+rule "Insert processors"
+	when
+		not Message(text == "Processors inserted")
+	then 
+		Processor standard = new Processor();
+		standard.setType("standard");
+		standard.setSocketType("pga");
+		insert(standard);
+		
+		Processor advanced = new Processor();
+		advanced.setType("advanced");
+		advanced.setSocketType("lga");
+		insert(advanced);
+		
+		insertLogMessage(drools, "Processors inserted");
+end
+
+
+# Business rules - used to define the logic to apply to the data.
+
+# Check for missing input data...
+
+rule "No selection"
+	when
+		not Selection()
+	then
+		insertMessage(drools, "No selection");
+end
+
+rule "No memory selected"
+	when
+		not MemorySelection()
+	then
+		insertMessage(drools, "No memory selected");
+end
+
+rule "No motherboard selected"
+	when
+		Selection(motherboardType == null)
+	then
+		insertMessage(drools, "No motherboard selected");
+end
+
+rule "No processor selected"
+	when
+		Selection(motherboardType != "integrated", processorType == null)
+	then
+		insertMessage(drools, "No processor selected");
+end
+
+# Check for invalid input data selections...
+
+rule "Selected motherboard type does not exist"
+	when
+		Selection($type : motherboardType != null)
+		not Motherboard(type == $type)
+	then
+		insertRuleMessage(drools);
+end
+
+rule "Selected processor type does not exist"
+	when
+		Selection($type : processorType != null)
+		not Processor(type == $type)
+	then
+		insertRuleMessage(drools);
+end
+
+rule "Selected memory DIMM size does not exist"
+	when
+		MemorySelection($size : dimmSize != 0)
+		not MemoryDimm(sizeInGigabytes == $size)
+	then
+		insertMessage(drools, String.format("Memory size %dGB does not exist", $size));
+end
+
+
+# Check for invalid input data combinations...
+
+rule "Integrated motherboard does not allow a processor"
+	when
+		Selection(motherboardType == "integrated", processorType != null)
+	then
+		insertRuleMessage(drools);
+end
+
+rule "Motherboard and processor socket types do not match"
+	when
+		Selection($motherboard : motherboardType != null && != "integrated", $processor : processorType != null)
+		Motherboard(type == $motherboard, $socket : socketType)
+		Processor(type == $processor, socketType != $socket)
+	then
+		insertRuleMessage(drools);
+end
+
+rule "Motherboard has too few memory sockets"
+	when
+		ArrayList($requiredSockets : size) from collect( MemorySelection() )
+		Selection($selectedMotherBoard : motherboardType)
+		Motherboard(type == $selectedMotherBoard, $availableSockets : memorySockets < $requiredSockets)
+	then
+		insertRuleMessage(drools);
+		insertMessage(drools, String.format("%d DIMM slots required, %d available", $requiredSockets, $availableSockets));
+end
+
+rule "Memory must be selected in matching pairs"
+	when
+		# Memory selection must fit in available motherboard memory slots, in matching pairs
+		MemorySelection($selectedDimmSize : dimmSize)
+		ArrayList($quantitySelected : size) from collect( MemorySelection(dimmSize == $selectedDimmSize) )
+		eval($quantitySelected % 2 != 0)
+		not Message(text == ($quantitySelected + " x " + $selectedDimmSize + "GB DIMMs selected"))
+	then
+		insertRuleMessage(drools);
+		insertMessage(drools, $quantitySelected + " x " + $selectedDimmSize + "GB DIMMs selected");
+end
+
+# Filter output options...
+
+rule "Filter processors for selected motherboard socket type"
+	when
+		Selection($motherboard : motherboardType != null)
+		Motherboard(type == $motherboard, $socket : socketType)
+		$processor : Processor(socketType != $socket)
+	then
+		log(drools, "Retract Processor " + $processor.getType());
+		retract($processor);
+end
+
+rule "Filter motherboards for selected processor socket type"
+	when
+		Selection($processor : processorType != null)
+		Processor(type == $processor, $socket : socketType)
+		$motherboard : Motherboard(socketType != $socket)
+	then
+		log(drools, "Retract Motherboard " + $motherboard.getType());
+		retract($motherboard);
+end

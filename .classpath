@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="lib" path="lib-compile/drools-5.1.0.M1/drools-core-5.1.0.M1.jar"/>
+	<classpathentry kind="lib" path="lib-runtime/log4j-1.2.15/log4j-1.2.15.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

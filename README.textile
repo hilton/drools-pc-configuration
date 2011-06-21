@@ -1,0 +1,10 @@
+Drools Excecution Server example for the Lunatech web site article "How to build a decision service using JBoss Rules Execution Server":http://www.lunatech-research.com/archives/2010/01/04/how-build-decision-service-using-jboss-rules-execution-server
+
+This is a simple example of a decision service, implemented using JBoss Rules. This example uses the Drools Execution Server; no Java code is required.
+
+h2. Install, configure, run
+
+# Download Apache Tomcat (this example was  testing with Tomcat 5.5.28)
+# Edit the value of the @deploy.dir@ property in @build.xml@
+# Run the @install@ Ant target to deploy the Drools Execution Server WAR to Tomcat.
+# Use the other Ant script targets to run the examples.
